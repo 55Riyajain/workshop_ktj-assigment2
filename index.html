@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minesweeper JavaScript Ultimate</title>
+    <!-- Lucide Icons via CDN for standard beautiful icons in Vanilla JS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/src/index.css" />
+  </head>
+  <body class="min-h-screen bg-stone-50 dark:bg-[#0f172a] text-stone-900 dark:text-slate-100 font-sans transition-colors duration-250 pb-16">
+    <div id="app-container" class="w-full">
+      
+      <!-- Visual Header Grid & Branding -->
+      <header class="w-full bg-linear-to-r from-stone-100 to-stone-50 dark:from-[#0f172a] dark:to-[#1e293b] border-b border-stone-200 dark:border-[#334155] py-6 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <!-- Elegant high-contrast graphic branding icon -->
+            <div id="logo-icon-container" class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-orange-600 dark:bg-[#fb7185] shadow-lg text-white select-none dark:shadow-[0_0_20px_rgba(251,113,133,0.45)]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-white">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 3v18M3 12h18M18.36 5.64l-12.72 12.72M5.64 5.64l12.72 12.72"/>
+              </svg>
+              <div class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </div>
+            </div>
+            
+            <div class="select-none">
+              <h1 class="text-2xl font-bold font-display tracking-tight text-stone-900 dark:text-white flex items-center gap-1.5 matches-classic">
+                KSHITIJ MINESWEEPER <span class="text-xs bg-stone-200 dark:bg-slate-800 text-amber-600 dark:text-[#22d3ee] font-mono px-2 py-0.5 rounded-full font-bold">A2: JS Entry</span>
+              </h1>
+              <p class="text-xs text-stone-500 dark:text-stone-400 font-medium font-mono">
+                Kshitij Web Dev & AI Workshop • Assignment 2 (Vanilla Mode)
+              </p>
+            </div>
+          </div>
+          
+          <!-- Quick Interactive Play Controls (Audio and Dark Mode toggle) -->
+          <div class="flex items-center gap-2">
+            <!-- Audio Toggle Panel -->
+            <button id="btn-audio-toggle" class="p-2.5 rounded-lg bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] text-stone-600 dark:text-slate-300 hover:bg-stone-50 dark:hover:bg-[#334155]/50 transition-colors pointer-hand cursor-pointer" title="Toggle audio feedback synthesis">
+              <i data-lucide="volume-2" class="w-5 h-5" id="audio-icon"></i>
+            </button>
+            <button id="btn-theme-toggle" class="p-2.5 rounded-lg bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] text-stone-600 dark:text-slate-300 hover:bg-stone-50 dark:hover:bg-[#334155]/50 transition-colors pointer-hand cursor-pointer" title="Toggle Dark/Light Mode">
+              <i data-lucide="moon" class="w-5 h-5" id="darkmode-icon"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Columns Frame Wrapper -->
+      <main id="main-frame" class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Interactive Gameboard Column layout (8 of 12) -->
+        <section id="gameboard-section" class="lg:col-span-8 flex flex-col items-center gap-4 w-full">
+          
+          <!-- Upper Game Status Dash -->
+          <div id="game-status-dash" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md select-none">
+            <!-- Left Group: Mine Count Counter -->
+            <div class="flex items-center gap-3">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">Mines Left</span>
+                <div class="flex items-center gap-1.5 font-mono text-2xl font-bold text-rose-500 dark:text-[#22d3ee]">
+                  <i data-lucide="bomb" class="w-5 h-5 opacity-90"></i>
+                  <span id="txt-mines-count">010</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Middle Group: Interactive Smiley Reset Icon Button -->
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-smiley-reset"
+                class="w-12 h-12 flex items-center justify-center bg-stone-100 hover:bg-stone-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-stone-250 dark:border-slate-700 rounded-xl shadow-inner text-2xl transition-transform active:scale-90 cursor-pointer"
+                title="Resets current board with the exact configured options size"
+              >
+                😃
+              </button>
+            </div>
+
+            <!-- Right Group: Live Digital Clock -->
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] text-stone-400 dark:text-stone-500 font-semibold">ELAPSED TIME</span>
+              <span class="font-mono text-2xl font-bold text-emerald-600 dark:text-[#22d3ee] flex items-center gap-1.5">
+                <span id="clock-ping-dot" class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#22d3ee] animate-ping"></span>
+                <span id="txt-elapsed-time">000</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Main Interactive Game Board Frame -->
+          <div id="game-board-frame" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-2xl p-6 shadow-sm flex items-center justify-center min-h-[300px] relative overflow-hidden">
+            <!-- The Board Grid (Dynamically rendered inside) -->
+            <div id="mines-grid" class="grid gap-1 transition-all duration-300 max-w-full overflow-auto p-1 rounded-lg"></div>
+
+            <!-- Overlays (Success / Game Over) -->
+            <div id="game-overlay-screen" class="absolute inset-0 bg-slate-900/85 backdrop-blur-xs flex flex-col items-center justify-center gap-4 p-6 text-center select-none z-20 pointer-events-none opacity-0 transition-opacity duration-300">
+              <div id="overlay-emoji" class="text-6xl animate-bounce">🏆</div>
+              <h2 id="overlay-title" class="text-3xl font-extrabold font-display tracking-tight text-white">VICTORY!</h2>
+              <p id="overlay-msg" class="text-sm text-slate-300 max-w-xs font-medium">You have safely identified all danger targets in record time!</p>
+              
+              <!-- Form to input name into leaderboard if won -->
+              <div id="leaderboard-entry-form" class="hidden flex-col gap-2 items-center w-full max-w-xs mt-2 pointer-events-auto">
+                <label class="text-xs text-amber-400 font-semibold font-mono">YOUR NAME FOR LEADERBOARD:</label>
+                <div class="flex w-full gap-2">
+                  <input type="text" id="ipt-player-name" maxlength="12" placeholder="Player Name" class="flex-1 bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-[#22d3ee] text-center font-bold">
+                  <button id="btn-submit-name" class="bg-[#22d3ee] text-slate-950 font-bold px-4 py-1.5 text-xs rounded-lg hover:bg-white transition-colors cursor-pointer">Submit</button>
+                </div>
+              </div>
+
+              <button id="btn-overlay-play-again" class="mt-2 px-5 py-2.5 bg-white text-slate-950 hover:bg-slate-100 active:scale-95 text-xs font-bold rounded-lg shadow-md transition-all cursor-pointer pointer-events-auto">
+                Play Again
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Helper guidelines card -->
+          <div id="helper-guideline-card" class="w-full bg-stone-100/60 dark:bg-[#1e293b]/60 border border-stone-200/50 dark:border-[#334155]/50 rounded-xl p-4 flex gap-3 select-none">
+            <div class="p-1 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 h-fit">
+              <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <h4 class="text-xs font-bold text-stone-700 dark:text-slate-200">Tactile Desktop Controls</h4>
+              <p class="text-[11px] leading-relaxed text-stone-500 dark:text-stone-400">
+                Left-Click to clear. Right-Click to flag potential targets. Double-click or Middle-click a disclosed safe cell to trigger adjacent chord clearing of cells. Touchscreen users are supported via automatic long-press mechanisms!
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Panels Sidebars Column (4 of 12) -->
+        <aside id="sidebars-column" class="lg:col-span-4 flex flex-col gap-6 w-full">
+          
+          <!-- Difficulty Preset Card -->
+          <div id="preset-controls-card" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-xl p-5 shadow-sm transition-all">
+            <div class="flex items-center gap-2 mb-4 select-none">
+              <i data-lucide="sliders" class="w-5 h-5 text-indigo-500"></i>
+              <h3 class="text-lg font-bold font-display text-stone-800 dark:text-stone-100">
+                Game Settings
+              </h3>
+            </div>
+
+            <div class="space-y-4">
+              <!-- Preset Grid Selection -->
+              <div class="grid grid-cols-2 gap-2 select-none" id="preset-selector-group">
+                <button data-difficulty="easy" class="btn-diff px-2.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border transition-all capitalize bg-stone-50 hover:bg-stone-100 dark:bg-[#0f172a] dark:hover:bg-[#334155] border-stone-200 dark:border-[#334155] text-stone-700 dark:text-slate-300">
+                  Easy
+                </button>
+                <button data-difficulty="medium" class="btn-diff px-2.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border transition-all capitalize bg-stone-50 hover:bg-stone-100 dark:bg-[#0f172a] dark:hover:bg-[#334155] border-stone-200 dark:border-[#334155] text-stone-700 dark:text-slate-300">
+                  Medium
+                </button>
+                <button data-difficulty="hard" class="btn-diff px-2.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border transition-all capitalize bg-stone-50 hover:bg-stone-100 dark:bg-[#0f172a] dark:hover:bg-[#334155] border-stone-200 dark:border-[#334155] text-stone-700 dark:text-slate-300">
+                  Hard
+                </button>
+                <button data-difficulty="custom" class="btn-diff px-2.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border transition-all capitalize bg-stone-50 hover:bg-stone-100 dark:bg-[#0f172a] dark:hover:bg-[#334155] border-stone-200 dark:border-[#334155] text-stone-700 dark:text-slate-300">
+                  Custom
+                </button>
+              </div>
+
+              <!-- Custom Grid Configuration Slider Controls (hidden unless custom selected) -->
+              <div id="panel-custom-configs" class="hidden space-y-3.5 bg-stone-50 dark:bg-[#0f172a] border border-stone-100 dark:border-[#334155] p-3.5 rounded-xl transition-all duration-200 shadow-2xs select-none">
+                
+                <!-- Rows Dimension Slider -->
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-stone-500 font-medium">Board Height (Rows)</span>
+                    <span class="font-mono font-bold text-stone-700 dark:text-[#22d3ee]" id="lbl-custom-rows">12</span>
+                  </div>
+                  <input type="range" id="rng-custom-rows" min="8" max="30" value="12" class="w-full accent-indigo-600 h-1 rounded-lg cursor-pointer">
+                </div>
+
+                <!-- Cols Dimension Slider -->
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-stone-500 font-medium">Board Width (Cols)</span>
+                    <span class="font-mono font-bold text-stone-700 dark:text-[#22d3ee]" id="lbl-custom-cols">12</span>
+                  </div>
+                  <input type="range" id="rng-custom-cols" min="8" max="30" value="12" class="w-full accent-indigo-600 h-1 rounded-lg cursor-pointer">
+                </div>
+
+                <!-- Mine count settings Slider -->
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-stone-500 font-medium">Total Danger Mines</span>
+                    <span class="font-mono font-bold text-red-500 dark:text-[#fb7185]" id="lbl-custom-mines">15</span>
+                  </div>
+                  <input type="range" id="rng-custom-mines" min="5" max="80" value="15" class="w-full accent-rose-600 h-1 rounded-lg cursor-pointer">
+                </div>
+              </div>
+
+              <!-- General Preset Details Description Box -->
+              <div class="text-[11px] text-stone-400 dark:text-stone-500 font-mono select-none" id="txt-preset-details">
+                <p class="flex justify-between items-center bg-stone-50 dark:bg-[#0f172a] py-1.5 px-2 rounded">
+                  <span>Dimensions: <span id="lbl-info-dim" class="font-bold text-stone-600 dark:text-stone-300">9 × 9</span></span>
+                  <span>Total Mines: <span id="lbl-info-mines" class="font-bold text-rose-500 dark:text-[#22d3ee]">10</span></span>
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Theme Visual Presets Selector Card -->
+          <div id="theme-selector-card" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-xl p-5 shadow-sm transition-all select-none">
+            <div class="flex items-center gap-2 mb-4">
+              <i data-lucide="palette" class="w-5 h-5 text-teal-500"></i>
+              <h3 class="text-lg font-bold font-display text-stone-800 dark:text-stone-100">
+                Visual Themes
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2" id="theme-preset-group">
+              <!-- Slate Theme -->
+              <button data-theme="slate" class="theme-btn h-9 rounded-md relative flex items-center justify-center cursor-pointer transition-all bg-gradient-to-r from-slate-700 to-slate-900 border border-slate-600 text-white shadow-2xs hover:scale-105 active:scale-95" title="Classic Slate font layout">
+                <span class="text-[10px] font-bold">Slate</span>
+              </button>
+              <!-- Emerald Theme -->
+              <button data-theme="emerald" class="theme-btn h-9 rounded-md relative flex items-center justify-center cursor-pointer transition-all bg-gradient-to-r from-emerald-800 to-emerald-950 border border-emerald-700 text-white shadow-2xs hover:scale-105 active:scale-95" title="Forest Emerald theme">
+                <span class="text-[10px] font-bold">Green</span>
+              </button>
+              <!-- Sunset Theme -->
+              <button data-theme="sunset" class="theme-btn h-9 rounded-md relative flex items-center justify-center cursor-pointer transition-all bg-gradient-to-r from-orange-600 to-amber-800 border border-orange-500 text-white shadow-2xs hover:scale-105 active:scale-95" title="Warm Sunset visual Peach theme">
+                <span class="text-[10px] font-bold">Sunset</span>
+              </button>
+              <!-- Cyberpunk Neon Theme -->
+              <button data-theme="cyber" class="theme-btn h-9 rounded-md relative flex items-center justify-center cursor-pointer transition-all bg-black border border-fuchsia-700 text-fuchsia-400 shadow-2xs hover:scale-105 active:scale-95" title="Retro Cyberpunk Neon HUD skin">
+                <span class="text-[10px] font-mono font-bold uppercase tracking-tight text-glow">Neon</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Durable statistics dashboard -->
+          <div id="statistics-card" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-xl p-5 shadow-sm transition-all">
+            <div class="flex items-center justify-between mb-4 select-none">
+              <div class="flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-500"></i>
+                <h3 class="text-lg font-bold font-display text-stone-800 dark:text-stone-100">
+                  Game Statistics
+                </h3>
+              </div>
+              <!-- Reset stats button -->
+              <button id="btn-reset-stats" class="text-xs text-stone-400 hover:text-red-500 transition-colors font-semibold py-0.5 px-2 rounded hover:bg-stone-100 dark:hover:bg-[#334155]/30 cursor-pointer flex items-center gap-1" title="Clears local storage game statistics files">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear
+              </button>
+            </div>
+
+            <!-- Main horizontal summary cards -->
+            <div class="grid grid-cols-3 gap-3 mb-5 select-none">
+              <!-- Total Played -->
+              <div class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-[#0f172a] border border-stone-100 dark:border-[#334155] rounded-lg text-center shadow-2xs">
+                <i data-lucide="play-circle" class="w-4 h-4 text-indigo-500 mb-1"></i>
+                <span id="stat-total-played" class="text-xl font-bold font-mono text-stone-800 dark:text-slate-100">0</span>
+                <span class="text-[10px] text-stone-400 font-medium whitespace-nowrap">Played</span>
+              </div>
+              <!-- Total Won -->
+              <div class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-[#0f172a] border border-stone-100 dark:border-[#334155] rounded-lg text-center shadow-2xs">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 mb-1"></i>
+                <span id="stat-total-won" class="text-xl font-bold font-mono text-stone-800 dark:text-slate-100 font-black">0</span>
+                <span class="text-[10px] text-stone-400 font-medium whitespace-nowrap">Wins</span>
+              </div>
+              <!-- Win rate percentage -->
+              <div class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-[#0f172a] border border-stone-100 dark:border-[#334155] rounded-lg text-center shadow-2xs">
+                <i data-lucide="percent" class="w-4 h-4 text-teal-500 mb-1"></i>
+                <span id="stat-win-rate" class="text-xl font-bold font-mono text-stone-800 dark:text-slate-100">0%</span>
+                <span class="text-[10px] text-stone-400 font-medium whitespace-nowrap">Win Rate</span>
+              </div>
+            </div>
+
+            <!-- Granular records table -->
+            <div class="overflow-x-auto select-none">
+              <table class="w-full text-xs text-left text-stone-600 dark:text-slate-300">
+                <thead>
+                  <tr class="border-b border-stone-200 dark:border-[#334155] text-stone-400 text-[11px] font-semibold">
+                    <th class="py-2">Difficulty</th>
+                    <th class="py-2 text-center">Played</th>
+                    <th class="py-2 text-center">Won</th>
+                    <th class="py-2 text-center">Rate</th>
+                    <th class="py-2 text-right">Best Time</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 dark:divide-[#334155]" id="stats-table-body">
+                  <!-- Generated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Dynamic Leaderboard Dashboard -->
+          <div id="leaderboard-card" class="w-full bg-white dark:bg-[#1e293b] border border-stone-200 dark:border-[#334155] rounded-xl p-5 shadow-sm transition-all">
+            <div class="flex items-center gap-2 mb-4 select-none">
+              <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i>
+              <h3 class="text-lg font-bold font-display text-stone-800 dark:text-stone-100">
+                Champions Board
+              </h3>
+            </div>
+
+            <div class="space-y-4" id="leaderboard-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </aside>
+      </main>
+
+    </div>
+
+    <!-- Loaded game logic module -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

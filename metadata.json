@@ -1,0 +1,6 @@
+{
+  "name": "Minesweeper Game",
+  "description": "An interactive, feature-rich Minesweeper game featuring adjustable difficulties, live statistics, customizable themes, dark mode, keyboard navigation, leaderboard, and question mark state markers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
